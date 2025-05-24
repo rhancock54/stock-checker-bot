@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout,
-    QLabel, QLineEdit, QPushButton, QHBoxLayout, QScrollArea, QFormLayout
+    QLabel, QLineEdit, QPushButton, QScrollArea, QFormLayout, QGroupBox
 )
 import sys
 
@@ -24,26 +24,37 @@ class MainWindow(QMainWindow):
         tab = QWidget()
         layout = QVBoxLayout()
 
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
 
-        scroll_content = QWidget()
-        form_layout = QFormLayout()
+        self.scroll_content = QWidget()
+        self.form_layout = QVBoxLayout()
 
-        form_layout.addRow("GPU Name:", QLineEdit())
-        form_layout.addRow("Min Price:", QLineEdit())
-        form_layout.addRow("Max Price:", QLineEdit())
-        form_layout.addRow("Shipping Limit ($):", QLineEdit())
+        self.gpu_blocks = []
+        self.add_gpu_input_block()
 
         add_button = QPushButton("+ Add another GPU")
+        add_button.clicked.connect(self.add_gpu_input_block)
 
-        form_layout.addRow(add_button)
-        scroll_content.setLayout(form_layout)
-        scroll.setWidget(scroll_content)
+        self.form_layout.addWidget(add_button)
+        self.scroll_content.setLayout(self.form_layout)
+        self.scroll_area.setWidget(self.scroll_content)
 
-        layout.addWidget(scroll)
+        layout.addWidget(self.scroll_area)
         tab.setLayout(layout)
         return tab
+
+    def add_gpu_input_block(self):
+        block = QGroupBox("GPU Search Criteria")
+        form = QFormLayout()
+        form.addRow("GPU Name:", QLineEdit())
+        form.addRow("Min Price:", QLineEdit())
+        form.addRow("Max Price:", QLineEdit())
+        form.addRow("Shipping Limit ($):", QLineEdit())
+        block.setLayout(form)
+
+        self.gpu_blocks.append(block)
+        self.form_layout.insertWidget(len(self.gpu_blocks) - 1, block)
 
     def create_tab(self, label_text):
         tab = QWidget()
