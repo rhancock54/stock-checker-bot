@@ -1,0 +1,4 @@
+[Unit]
+Description=Start bot
+[Service]
+ExecStart=/usr/bin/python3 checker.py

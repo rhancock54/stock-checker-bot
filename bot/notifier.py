@@ -1,0 +1,1 @@
+print('Notifier ready')
