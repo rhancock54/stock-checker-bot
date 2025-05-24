@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout,
-    QLabel, QLineEdit, QPushButton, QScrollArea, QFormLayout, QGroupBox
+    QLabel, QLineEdit, QPushButton, QScrollArea, QFormLayout, QGroupBox, QHBoxLayout
 )
 import sys
 
@@ -33,10 +33,10 @@ class MainWindow(QMainWindow):
         self.gpu_blocks = []
         self.add_gpu_input_block()
 
-        add_button = QPushButton("+ Add another GPU")
-        add_button.clicked.connect(self.add_gpu_input_block)
+        self.add_button = QPushButton("+ Add another GPU")
+        self.add_button.clicked.connect(self.add_gpu_input_block)
 
-        self.form_layout.addWidget(add_button)
+        self.form_layout.addWidget(self.add_button)
         self.scroll_content.setLayout(self.form_layout)
         self.scroll_area.setWidget(self.scroll_content)
 
@@ -46,15 +46,34 @@ class MainWindow(QMainWindow):
 
     def add_gpu_input_block(self):
         block = QGroupBox("GPU Search Criteria")
+        block_layout = QVBoxLayout()
+
         form = QFormLayout()
         form.addRow("GPU Name:", QLineEdit())
         form.addRow("Min Price:", QLineEdit())
         form.addRow("Max Price:", QLineEdit())
         form.addRow("Shipping Limit ($):", QLineEdit())
-        block.setLayout(form)
+
+        remove_btn = QPushButton("Remove")
+        remove_btn.clicked.connect(lambda _, b=block: self.remove_gpu_block(b))
+        btn_layout = QHBoxLayout()
+        btn_layout.addStretch()
+        btn_layout.addWidget(remove_btn)
+
+        block_layout.addLayout(form)
+        block_layout.addLayout(btn_layout)
+        block.setLayout(block_layout)
 
         self.gpu_blocks.append(block)
         self.form_layout.insertWidget(len(self.gpu_blocks) - 1, block)
+
+    def remove_gpu_block(self, block):
+        if len(self.gpu_blocks) == 1:
+            return  # Don't remove the last remaining block
+
+        self.form_layout.removeWidget(block)
+        block.setParent(None)
+        self.gpu_blocks.remove(block)
 
     def create_tab(self, label_text):
         tab = QWidget()
